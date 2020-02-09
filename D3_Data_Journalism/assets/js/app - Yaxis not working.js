@@ -140,14 +140,14 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .text("Smokes (%)");
 
   // chartGroup.append("text")
-  var obesityLabel = ylabelsGroup.append("text")
+  var obeseLabel = ylabelsGroup.append("text")
     // .attr("transform", "rotate(-90)")
     .attr("y", 40 - margin.left)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
-    .attr("value", "obesity")
+    .attr("value", "obese")
     .classed("axis-text", true)
-    .text("Obesity (%)");
+    .text("Obese (%)");
 
 
 //  // function used for updating circles group with new tooltip
@@ -185,47 +185,36 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
 
 
   // function used for updating x-scale var upon click on axis label
-function xScale(allFields, chosenXAxis) {
-  var xLinearScale = d3.scaleLinear()
-    .domain([d3.min(allFields, d => d[chosenXAxis]) * 0.8,
-      d3.max(allFields, d => d[chosenXAxis]) * 1.2
-    ])
-    .range([0, width]);
-  return xLinearScale;
-  }
+  function xScale(allFields, chosenXAxis) {
+    // create scales
+    var xLinearScale = d3.scaleLinear()
+      .domain([d3.min(allFields, d => d[chosenXAxis]) * 0.8,
+        d3.max(allFields, d => d[chosenXAxis]) * 1.2
+      ])
+      .range([0, width]);
 
-   // function used for updating x-scale var upon click on axis label
- function yScale(allFields, chosenYAxis) {
-  var yLinearScale = d3.scaleLinear()
-  .domain([0, d3.max(allFields, d => d[chosenYAxis])])
-  .range([height, 0]);
-  return yLinearScale;
-  }
+    return xLinearScale;
+
+}
+
 // function used for updating xAxis var upon click on axis label
-function renderXAxes(newXScale, xAxis) {
+function renderAxes(newXScale, xAxis) {
   var bottomAxis = d3.axisBottom(newXScale);
+
   xAxis.transition()
     .duration(1000)
     .call(bottomAxis);
+
   return xAxis;
-  }
-// function used for updating yAxis var upon click on yxis label
-function renderYAxes(newYScale, yAxis) {
-  var leftAxis = d3.axisLeft(newYScale);
-  console.log("IS THIS THE PROBLEM?")
-  yAxis.transition()
-    .duration(1000)
-    .call(leftAxis);
-  return yAxis;
-  }
+}
 
 // function used for updating circles group with a transition to
 // new circles
-function renderXCircles(circlesGroup, newXScale, chosenXaxis) {
+function renderCircles(circlesGroup, newXScale, chosenXaxis) {
 
   circlesGroup.transition()
     .duration(1000)
-    .attr("cx", d => newXScale(d[chosenXaxis]));
+    .attr("cx", d => newXScale(d[chosenXAxis]));
 
   return circlesGroup;
 }
@@ -241,9 +230,16 @@ function renderXCircles(circlesGroup, newXScale, chosenXaxis) {
         chosenXAxis = value;
 
         console.log(chosenXAxis)
+
+        // functions here found above csv import
+        // updates x scale for new data
         xLinearScale = xScale(myData, chosenXAxis);
-        xAxis = renderXAxes(xLinearScale, xAxis);
-        circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
+
+        // updates x axis with transition
+        xAxis = renderAxes(xLinearScale, xAxis);
+
+        // updates circles with new x values
+        circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
 
 // //         // updates tooltips with new info
 // //         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
@@ -282,35 +278,67 @@ function renderXCircles(circlesGroup, newXScale, chosenXaxis) {
             .classed("active", true)
             .classed("inactive", false);
         }
+
+      
+
       }
     });
 
 /////ALSO FOR THE Y-AXIS:
 
+ // function used for updating x-scale var upon click on axis label
+ function yScale(allFields, chosenYAxis) {
+  // create scales
+  var yLinearScale = d3.scaleLinear()
+  .domain([0, d3.max(myData, d => d[chosenYAxis])])
+  .range([height, 0]);
+
+  return yLinearScale;
+
+}
+
+// function used for updating xAxis var upon click on axis label
+function renderyAxes(newYScale, yAxis) {
+var leftAxis = d3.axisLeft(newYScale);
+
+console.log("IS THIS THE PROBLEM?")
+
+yAxis.transition()
+  .duration(1000)
+  .call(leftAxis);
+
+return yAxis;
+}
+
 // function used for updating circles group with a transition to
 // new circles
-function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
-    console.log(chosenXAxis);
-    console.log(chosenYAxis);
-    
-    circlesGroup.transition()
-      .duration(1000)
-      // .attr("cy", d => newYScale(d.smokes));
-      .attr("cy", d => newYScale(d[chosenYAxis]));
+function renderyCircles(circlesGroup, newYScale, chosenYaxis) {
 
-    return circlesGroup;
-    }
+circlesGroup.transition()
+  .duration(1000)
+  .attr("cy", d => newYScale(d[chosenYAxis]));
+
+return circlesGroup;
+}
+
+/////////////////////////////////////////
+
 
 
 // y axis labels event listener
 ylabelsGroup.selectAll("text")
 
   .on("click", function() {
+  // get value of selection
   var value = d3.select(this).attr("value");
+  
   console.log("Chosen: " + value);
 
   if (value !== chosenYAxis) {
+
+    // replaces chosenXAxis with value
     chosenYAxis = value;
+
     console.log(chosenYAxis)
 
     // functions here found above csv import
@@ -318,10 +346,10 @@ ylabelsGroup.selectAll("text")
     yLinearScale = yScale(myData, chosenYAxis);
 
     // updates x axis with transition
-    yAxis = renderYAxes(yLinearScale, yAxis);
+    yAxis = renderAxes(yLinearScale, yAxis);
 
     // updates circles with new x values
-    circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
+    circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis);
 
 // //         // updates tooltips with new info
 // //         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
@@ -334,7 +362,7 @@ ylabelsGroup.selectAll("text")
       smokeLabel
         .classed("active", false)
         .classed("inactive", true);
-      obesityLabel
+      obeseLabel
         .classed("active", false)
         .classed("inactive", true);
     }
@@ -345,7 +373,7 @@ ylabelsGroup.selectAll("text")
       healthLabel
         .classed("active", false)
         .classed("inactive", true);
-      obesityLabel
+      obeseLabel
         .classed("active", false)
         .classed("inactive", true);
     }
@@ -356,7 +384,7 @@ ylabelsGroup.selectAll("text")
       smokeLabel
         .classed("active", false)
         .classed("inactive", true);
-      obesityLabel
+      obeseLabel
         .classed("active", true)
         .classed("inactive", false);
     }
