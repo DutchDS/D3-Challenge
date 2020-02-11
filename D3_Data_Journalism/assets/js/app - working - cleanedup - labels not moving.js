@@ -68,35 +68,57 @@ function renderYAxes(newYScale, yAxis) {
   return yAxis;
   }
 // function used for updating circles group with a transition to new circles
-function renderXCircles(circlesGroup, textGroup, newXScale, chosenXaxis) {
+function renderXCircles(circlesGroup, newXScale, chosenXaxis) {
 
   circlesGroup.transition()
     .duration(1000)
     .attr("cx", d => newXScale(d[chosenXaxis]))
     // .attr("dx", d => newXScale(d[chosenXAxis]))
-  textGroup.transition()
-    .duration(1000)
-    .attr("x", d => newXScale(d[chosenXaxis])-8)
 
       /* Create the text for each block */
   return circlesGroup;
   } 
 // function used for updating circles group with a transition to new circles
-function renderYCircles(circlesGroup, textGroup, newYScale, chosenYAxis) {
+function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
   console.log(chosenXAxis);
   console.log(chosenYAxis);
   
   circlesGroup.transition()
     .duration(1000)
     .attr("cy", d => newYScale(d[chosenYAxis]))
-  
-  textGroup.transition()
-    .duration(1000)
-    .attr("y", d => newYScale(d[chosenYAxis])+5)
- 
+    // .attr("dy", d => newYScale(d[chosenYAxis]))
+
   return circlesGroup;
   }
+ // function used for updating circles group with new tooltip
+ function updateToolTip(chosenXAxis, circlesGroup) {
 
+  // if (chosenXAxis === "hair_length") {
+  //   var label = "Hair Length:";
+  // }
+  // else {
+  //   var label = "# of Albums:";
+  // }
+
+  // var toolTip = d3.tip()
+  //   .attr("class", "tooltip")
+  //   .offset([80, -60])
+  //   .html(function(d) {
+  //     return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
+  //   });
+  
+  // circlesGroup.call(toolTip);
+  // }
+  // circlesGroup.on("mouseover", function(data) {
+  //   toolTip.show(data);
+  // })
+  //   // onmouseout event
+  //   .on("mouseout", function(data, index) {
+  //     toolTip.hide(data);
+  //   });
+
+  // return circlesGroup;
+  }
 
 // Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(myData, err) {
@@ -115,9 +137,16 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
 
   // xLinearScale function above csv import
   var xLinearScale = xScale(myData, chosenXAxis);
+  // var xLinearScale = d3.scaleLinear()
+  //   .domain([d3.min(myData, d => d[chosenXAxis]) * 0.8,
+  //         d3.max(myData, d => d[chosenXAxis]) * 1.2])
+  //   .range([0, width]);
 
   // Create y scale function
   var yLinearScale = yScale(myData, chosenYAxis);
+  // var yLinearScale = d3.scaleLinear()
+  //   .domain([0, d3.max(myData, d => d[chosenYAxis])])
+  //   .range([height, 0]);
 
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
@@ -134,8 +163,31 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .classed("y-axis", true)
     .call(leftAxis);
 
-  // // append initial circles
-  var circlesGroup = chartGroup.selectAll(".node")
+///////////////////////////////////////////////////////////////////////
+// FILLS CIRCLES WITH STATES ONLY ONCE - THEN NOTHING MOVES ANYMORE////
+///////////////////////////////////////////////////////////////////////
+
+// var circlesGroup = chartGroup.selectAll(".node")
+//     .data(myData)
+//     .enter()
+//     .append("g")
+//     .attr("class", ".node")
+
+//     circlesGroup.append("circle")
+//     .attr("cx", d => xLinearScale(d[chosenXAxis]))
+//     .attr("cy", d => yLinearScale(d[chosenYAxis]))
+//     .attr("r", 15)
+//     .attr("fill", "darkblue")
+//     .attr("opacity", ".75")
+
+//     circlesGroup.append("text")
+//     .attr("dx", d => xLinearScale(d[chosenXAxis])-d3.min(myData, d => d[chosenXAxis]) * 0.8)
+//     .attr("dy", d => yLinearScale(d[chosenYAxis]))
+//     .text(d => d.abbr);
+
+
+  // append initial circles
+  var circlesGroup = chartGroup.selectAll("circle").select(".node")
     .data(myData)
     .enter()
     .append("g")
@@ -144,43 +196,28 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
     .attr("r", 15)
-    .attr("fill", "red")
-    .attr("opacity", ".5")
-    .text(d => d.abbr)
-    .attr("font-size", "10px")
-  
-  // // append initial circles
-  var textGroup = chartGroup.selectAll(".node")
+    .attr("fill", "rgb(89, 110, 117)")
+    .attr("opacity", ".75")
+
+  // chartGroup.selectAll("text").select(".node")
+  //   .data(myData)
+  //   .enter()
+  //   .append("text")
+  //   .attr("dx", d => xLinearScale(d[chosenXAxis])-d3.min(myData, d => d[chosenXAxis]) * 0.8)
+  //   .attr("dy", d => yLinearScale(d[chosenYAxis]))
+  //   .text(d => d.abbr);
+
+    
+  circlesGroup.select("g")
+    .exit()
+    .remove("text")
     .data(myData)
     .enter()
-    .append("g")
-    .attr("class", "text")
     .append("text")
-    .attr("x", d => xLinearScale(d[chosenXAxis])-8)
-    .attr("y", d => yLinearScale(d[chosenYAxis])+5)
-    .text(d => d.abbr)
-    .attr("font-size", "12px")
+    .attr("dx", d => xLinearScale(d[chosenXAxis])-d3.min(myData, d => d[chosenXAxis]) * 0.8)
+    .attr("dy", d => yLinearScale(d[chosenYAxis]))
+    .text(d => d.abbr);
 
-///////////////////////////////////////////////////////////    
-/////////// Tooltip stuff /////////////////////////////////
-///////////////////////////////////////////////////////////
-
-  var toolTip = d3.tip()
-    .attr("class", "tooltip")
-    .offset([30, 90])
-    .html(function(d) {
-      return (`State: ${d.abbr}<br> Age ${d.age}`);
-    });
-
-  chartGroup.call(toolTip);
-
-  circlesGroup.on("mouseover", function(data) {
-    toolTip.show(data, this);
-    })
-    .on("mouseout", function(data, index) {
-      toolTip.hide(data);
-    });
-  
   /////////////////////////////////////////////////
   ///// Create group for  3 x- axis labels ////////
   /////////////////////////////////////////////////
@@ -264,8 +301,7 @@ xlabelsGroup.selectAll("text")
         console.log(chosenXAxis)
         xLinearScale = xScale(myData, chosenXAxis);
         xAxis = renderXAxes(xLinearScale, xAxis);
-        circlesGroup = renderXCircles(circlesGroup, textGroup, xLinearScale, chosenXAxis);
-        // textGroup = renderXText(textGroup, xLinearScale, chosenXAxis);
+        circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
 
 // //         // updates tooltips with new info
 // //         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
@@ -319,8 +355,7 @@ ylabelsGroup.selectAll("text")
 
     yLinearScale = yScale(myData, chosenYAxis);
     yAxis = renderYAxes(yLinearScale, yAxis);
-    circlesGroup = renderYCircles(circlesGroup, textGroup, yLinearScale, chosenYAxis);
-    // textGroup = renderYText(textGroup, yLinearScale, chosenYAxis);
+    circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
 
 // //         // updates tooltips with new info
 // //         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
@@ -363,7 +398,6 @@ ylabelsGroup.selectAll("text")
   }
   
   });
-
 }).catch(function(error) {
   console.log(error);
 
