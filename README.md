@@ -7,6 +7,6 @@ With interactive x- and y-axis, tooltips and transition features, it was a prett
 
 [Here's](https://dutchds.github.io/D3-Challenge/index.html) the website. And a little video to see how it works in a glance:  
 
-![chart_animation.gif](chart_animatition.gif) 
+![chart_animation.gif](chart_animation.gif) 
 
 
