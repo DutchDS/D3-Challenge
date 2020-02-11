@@ -5,8 +5,8 @@ More Javascript this week as D3.js is introduced. The challenge: to take the res
 
 With interactive x- and y-axis, tooltips and transition features, it was a pretty tedious, but in the end rewarding way of programming this interactive webpage.
 
-[Here's](https://dutchds.github.io/D3-Challenge/index.html) the website. And a little video to see how it works in a glance:  
+[Here's](https://dutchds.github.io/D3-Challenge/index.html) the website. This is how it works in a glance:  
 
-![chart_animation.gif](chart_animation.gif) 
+![chart_animation.gif](D3_Data_Journalism/assets/images/chart_animation.gif) 
 
 
