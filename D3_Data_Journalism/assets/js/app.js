@@ -1,34 +1,30 @@
-    var svgWidth = 960;
-    var svgHeight = 500;
-    
-    var margin = {
-      top: 20,
-      right: 40,
-      bottom: 80,
-      left: 100
-    };
-    
-    var width = svgWidth - margin.left - margin.right;
-    var height = svgHeight - margin.top - margin.bottom;
-    
 ///////////////////////////////////////////////////////////////////////////////////    
-/////////// Create an SVG wrapper, append an SVG group that will hold our chart,///
-/////////// and shift the latter by left and top margins.//////////////////////////
+/////////// Create an SVG wrapper, append groups and set default variables ////////
 ///////////////////////////////////////////////////////////////////////////////////
 
-    var svg = d3
-      .select("#scatter")
-      .append("svg")
-      .attr("width", svgWidth)
-      .attr("height", svgHeight);
+var svgWidth = 960;
+var svgHeight = 500;
 
-    // Append an SVG group
-    var chartGroup = svg.append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+var margin = {
+  top: 20,
+  right: 40,
+  bottom: 80,
+  left: 100};
 
-    // Initial Params
-    var chosenXAxis = "poverty";
-    var chosenYAxis = "healthcare";
+var width = svgWidth - margin.left - margin.right;
+var height = svgHeight - margin.top - margin.bottom;
+
+var svg = d3
+  .select("#scatter")
+  .append("svg")
+  .attr("width", svgWidth)
+  .attr("height", svgHeight);
+
+var chartGroup = svg.append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+var chosenXAxis = "poverty";
+var chosenYAxis = "healthcare";
 
 //////////////////////////////////////////////////////////////    
 /////////// Define all functions//////////////////////////////
@@ -97,12 +93,13 @@ function renderYCircles(circlesGroup, textGroup, newYScale, chosenYAxis) {
   return circlesGroup;
   }
 
+///////////////////////////////////////////////////////////////////////////////////
+//////////// Retrieve data from the CSV file and execute everything below//////////
+///////////////////////////////////////////////////////////////////////////////////
 
-// Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(myData, err) {
   if (err) throw err;
 
-  // parse data
   myData.forEach(function(data) {
     data.poverty = +data.poverty;
     data.age = +data.age;
@@ -113,29 +110,26 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     console.log("state and abbr: " + data.abbr + " - " + data.state)
   });
 
-  // xLinearScale function above csv import
   var xLinearScale = xScale(myData, chosenXAxis);
-
-  // Create y scale function
   var yLinearScale = yScale(myData, chosenYAxis);
 
-  // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
   var leftAxis = d3.axisLeft(yLinearScale);
 
-  // append x axis
   var xAxis = chartGroup.append("g")
     .classed("x-axis", true)
     .attr("transform", `translate(0, ${height})`)
     .call(bottomAxis);
 
-  // append y axis
   var yAxis = chartGroup.append("g")
     .classed("y-axis", true)
     .call(leftAxis);
 
-  // // append initial circles
-  var circlesGroup = chartGroup.selectAll(".node")
+///////////////////////////////////////////////////////////    
+/////////// Circles and Text //////////////////////////////
+///////////////////////////////////////////////////////////
+
+var circlesGroup = chartGroup.selectAll(".node")
     .data(myData)
     .enter()
     .append("g")
@@ -144,12 +138,11 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
     .attr("r", 15)
-    .attr("fill", "red")
-    .attr("opacity", ".5")
+    .attr("fill", "rgba(253, 63, 63, 0.8)")
+    .attr("opacity", ".6")
     .text(d => d.abbr)
     .attr("font-size", "10px")
   
-  // // append initial circles
   var textGroup = chartGroup.selectAll(".node")
     .data(myData)
     .enter()
@@ -160,6 +153,7 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .attr("y", d => yLinearScale(d[chosenYAxis])+5)
     .text(d => d.abbr)
     .attr("font-size", "12px")
+    .attr("font-weight", "bold")
 
 ///////////////////////////////////////////////////////////    
 /////////// Tooltip stuff /////////////////////////////////
@@ -169,7 +163,7 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .attr("class", "tooltip")
     .offset([30, 90])
     .html(function(d) {
-      return (`State: ${d.abbr}<br> Age ${d.age}`);
+      return (`${d.state}<br>Average Age: ${d.age}<br>Median Income: ${d.income}`);
     });
 
   chartGroup.call(toolTip);
@@ -216,11 +210,8 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
   var ylabelsGroup = chartGroup.append("g")
     .attr("transform", `translate(${width + 20}, ${height / 2})`)
     .attr("transform", "rotate(-90)");
-  
-    // append y axis
-  // chartGroup.append("text")
+ 
   var healthLabel = ylabelsGroup.append("text")
-    // .attr("transform", "rotate(-90)")
     .attr("y", 0 - margin.left)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
@@ -228,9 +219,7 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .classed("active", true)
     .text("Lacks Heathcare (%)");
 
-  // chartGroup.append("text")
   var smokeLabel = ylabelsGroup.append("text")
-    // .attr("transform", "rotate(-90)")
     .attr("y", 20 - margin.left)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
@@ -238,9 +227,7 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
     .classed("inactive", true)
     .text("Smokes (%)");
 
-  // chartGroup.append("text")
   var obesityLabel = ylabelsGroup.append("text")
-    // .attr("transform", "rotate(-90)")
     .attr("y", 40 - margin.left)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
@@ -251,26 +238,22 @@ d3.csv("assets/data/data.csv").then(function(myData, err) {
 // // updateToolTip function above csv import
 // var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-  // x axis labels event listener
 xlabelsGroup.selectAll("text")
     .on("click", function() {
-      // get value of selection
+
       var value = d3.select(this).attr("value");
       if (value !== chosenXAxis) {
 
-        // replaces chosenXAxis with value
         chosenXAxis = value;
 
         console.log(chosenXAxis)
         xLinearScale = xScale(myData, chosenXAxis);
         xAxis = renderXAxes(xLinearScale, xAxis);
         circlesGroup = renderXCircles(circlesGroup, textGroup, xLinearScale, chosenXAxis);
-        // textGroup = renderXText(textGroup, xLinearScale, chosenXAxis);
-
+ 
 // //         // updates tooltips with new info
 // //         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-        // changes classes to change bold text
         if (chosenXAxis === "age") {
           ageLabel
             .classed("active", true)
@@ -320,12 +303,10 @@ ylabelsGroup.selectAll("text")
     yLinearScale = yScale(myData, chosenYAxis);
     yAxis = renderYAxes(yLinearScale, yAxis);
     circlesGroup = renderYCircles(circlesGroup, textGroup, yLinearScale, chosenYAxis);
-    // textGroup = renderYText(textGroup, yLinearScale, chosenYAxis);
 
 // //         // updates tooltips with new info
 // //         circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-    // changes classes to change bold text
     if (chosenYAxis === "healthcare") {
       healthLabel
         .classed("active", true)
@@ -359,12 +340,8 @@ ylabelsGroup.selectAll("text")
         .classed("active", true)
         .classed("inactive", false);
     }
-
-  }
-  
+  }  
   });
-
 }).catch(function(error) {
-  console.log(error);
-
+    console.log(error);
 });

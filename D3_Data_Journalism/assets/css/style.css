@@ -1,6 +1,6 @@
 html {
   /* background: url(../images/smoke1.jpg) no-repeat center center fixed;  */
-  background-color: rgb(124, 157, 168);
+  background-color: rgba(179, 86, 86, 0.8);
   background-size: cover;
 }
 .iframeContainer {
@@ -16,7 +16,7 @@ html {
 
 body {
   /* Padding bottom by footer height */
-  opacity: 85%;
+  opacity: 100%;
   padding-bottom: 80px;
   padding-top: 20px;
   margin-left: 10%;
@@ -38,9 +38,13 @@ h1 {
   font: 12px sans-serif;
   color: rgb(255, 255, 255);
   text-align: center;
-  background: #551aaf;
+  background:  rgba(177, 0, 0, 0.8);
   border: 0;
   border-radius: 10px;
+}
+
+.article {
+  padding: 50px;
 }
 
 #footer {
