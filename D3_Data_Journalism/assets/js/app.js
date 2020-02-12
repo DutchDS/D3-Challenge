@@ -2,7 +2,7 @@
 /////////// Create an SVG wrapper, append groups and set default variables ////////
 ///////////////////////////////////////////////////////////////////////////////////
 
-var svgWidth = 960;
+var svgWidth = 860;
 var svgHeight = 500;
 
 var margin = {
