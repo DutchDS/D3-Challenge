@@ -42,7 +42,7 @@ function xScale(allFields, chosenXAxis) {
 // function used for updating x-scale var upon click on axis label
 function yScale(allFields, chosenYAxis) {
   var yLinearScale = d3.scaleLinear()
-  .domain([0, d3.max(allFields, d => d[chosenYAxis])])
+  .domain([d3.min(allFields, d => d[chosenYAxis]) * 0.8, d3.max(allFields, d => d[chosenYAxis])])
   .range([height, 0]);
   return yLinearScale;
   }
