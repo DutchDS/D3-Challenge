@@ -16,7 +16,7 @@ html {
 
 body {
   /* Padding bottom by footer height */
-  opacity: 100%;
+  /* opacity: 100%; */
   padding-bottom: 20px;
   padding-left: 20px;
   padding-right: 20px;
@@ -24,7 +24,7 @@ body {
   margin-left: 5%;
   margin-right: 5%;
   margin-top: 3%;
-  background-color: #e0e1e2;
+  background-color: "white";
 }
 
 h1 {
